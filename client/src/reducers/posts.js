@@ -5,6 +5,7 @@ export default (posts = [], action) => {
     case 'CREATE':
       return [...posts, action.payload]
     case 'UPDATE':
+    case 'LIKE':
       // post tüm postlar
       // action daki post güncellenmiş olan
       // o yüzden eskisi ile yer değiştiriyoruz

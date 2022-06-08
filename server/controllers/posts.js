@@ -43,7 +43,7 @@ export const updatePost = async (req, res) => {
       }
     )
 
-    res.json(updatedPost)
+    res.status(200).json(updatedPost)
   } catch (error) {
     //FIXME: check this after, be sure for correct status code returned
     res.status(409).json({ message: error })
@@ -63,5 +63,28 @@ export const deletePost = async (req, res) => {
   } catch (error) {
     //FIXME: check this after, be sure for correct status code returned
     res.status(409).json({ message: error })
+  }
+}
+
+export const likePost = async (req, res) => {
+  const { id } = req.params
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(404).send('No post with that id!')
+
+  const post = await PostMessage.findById(id)
+
+  if (!post) return res.status(404).json({ message: 'Post not found!' })
+
+  try {
+    const updatedPost = await PostMessage.findByIdAndUpdate(
+      id,
+      { likeCount: post.likeCount + 1 },
+      { new: true }
+    )
+    res.status(200).json(updatedPost)
+  } catch (error) {
+    //FIXME: check this after, be sure for correct status code returneds
+    return res.status(409).json({ message: error })
   }
 }
