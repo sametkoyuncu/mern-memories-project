@@ -6,9 +6,12 @@ import {
   Grid,
   Typography,
   Container,
-  TextField,
 } from '@material-ui/core'
 import LockOutlinedIcon from '@material-ui/icons/LockOpenOutlined'
+import { GoogleLogin } from '@react-oauth/google'
+import { useDispatch } from 'react-redux'
+import jwt from 'jwt-decode'
+
 import Input from './Input'
 import useStyles from './styles.js'
 
@@ -16,14 +19,31 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const classes = useStyles()
+  const dispatch = useDispatch()
 
-  const handleSubmit = () => {} // https://youtu.be/VsUzmlZfYNg?t=11307
+  const handleSubmit = () => {}
   const handleChange = () => {}
   const handleShowPassword = () =>
     setShowPassword((prevShowPassword) => !prevShowPassword)
   const switchMode = () => {
     setIsSignUp((prevIsSignUp) => !prevIsSignUp)
     setShowPassword(false)
+  }
+
+  const googleSuccess = async (res) => {
+    console.log('login success')
+    const result = jwt(res.credential)
+    const token = result.jti
+
+    try {
+      dispatch({ type: 'AUTH', data: { result, token } })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const googleFailure = async (error) => {
+    console.log(error)
+    console.log('Google Sign In was unsuccessful. Try again later.')
   }
 
   return (
@@ -84,7 +104,16 @@ const Auth = () => {
           >
             {isSignUp ? 'Sign Up' : 'Sign In'}
           </Button>
-          <Grid container justify="flex-end">
+          <Grid
+            container
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item>
+              <GoogleLogin onSuccess={googleSuccess} onError={googleFailure} />
+            </Grid>
             <Grid item>
               <Button onClick={switchMode}>
                 {isSignUp
