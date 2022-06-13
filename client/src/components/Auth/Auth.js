@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import {
   Avatar,
   Button,
@@ -20,6 +21,7 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const handleSubmit = () => {}
   const handleChange = () => {}
@@ -37,6 +39,8 @@ const Auth = () => {
 
     try {
       dispatch({ type: 'AUTH', data: { result, token } })
+
+      history.push('/')
     } catch (error) {
       console.log(error)
     }
