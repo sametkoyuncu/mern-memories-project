@@ -14,19 +14,41 @@ import { useDispatch } from 'react-redux'
 import jwt from 'jwt-decode'
 
 import Input from './Input'
+import { signin, signup } from '../../actions/auth'
 import useStyles from './styles.js'
+
+const initialFormState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+}
 
 const Auth = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+  const [formData, setFormData] = useState({ ...initialFormState })
   const classes = useStyles()
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const handleSubmit = () => {}
-  const handleChange = () => {}
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (isSignUp) {
+      dispatch(signup(formData, history))
+    } else {
+      dispatch(signin(formData, history))
+    }
+  }
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+
   const handleShowPassword = () =>
     setShowPassword((prevShowPassword) => !prevShowPassword)
+
   const switchMode = () => {
     setIsSignUp((prevIsSignUp) => !prevIsSignUp)
     setShowPassword(false)
