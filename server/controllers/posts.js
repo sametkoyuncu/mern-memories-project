@@ -69,19 +69,28 @@ export const deletePost = async (req, res) => {
 export const likePost = async (req, res) => {
   const { id } = req.params
 
+  if (!req.userId) return res.status(401).json({ message: 'Unauthenticated' })
+
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send('No post with that id!')
 
   const post = await PostMessage.findById(id)
 
+  const index = post.likes.findIndex((id) => id === String(req.userId))
+
+  if (index === -1) {
+    // like the post
+    post.likes.push(req.userId)
+  } else {
+    // unlike the post
+    post.likes = post.likes.filter((id) => id !== String(req.userId))
+  }
   if (!post) return res.status(404).json({ message: 'Post not found!' })
 
   try {
-    const updatedPost = await PostMessage.findByIdAndUpdate(
-      id,
-      { likeCount: post.likeCount + 1 },
-      { new: true }
-    )
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
+      new: true,
+    })
     res.status(200).json(updatedPost)
   } catch (error) {
     //FIXME: check this after, be sure for correct status code returneds
