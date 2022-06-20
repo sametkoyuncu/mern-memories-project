@@ -40,13 +40,9 @@ export const getPostsBySearch = async (req, res) => {
   const { searchQuery, tags } = req.query
   try {
     const title = new RegExp(searchQuery, 'i')
-    console.error('1')
     const postMessages = await PostMessage.find({
       $or: [{ title }, { tags: { $in: tags.split(',') } }],
     })
-
-    console.error('2')
-    console.log(postMessages)
 
     res.status(200).json({ data: postMessages })
   } catch (error) {
@@ -136,6 +132,26 @@ export const likePost = async (req, res) => {
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
       new: true,
     })
+    res.status(200).json(updatedPost)
+  } catch (error) {
+    //FIXME: check this after, be sure for correct status code returneds
+    return res.status(409).json({ message: error })
+  }
+}
+
+export const commentPost = async (req, res) => {
+  const { id } = req.params
+  const { value } = req.body
+
+  try {
+    const post = await PostMessage.findById(id)
+
+    post.comments.push(value)
+
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
+      new: true,
+    })
+
     res.status(200).json(updatedPost)
   } catch (error) {
     //FIXME: check this after, be sure for correct status code returneds
